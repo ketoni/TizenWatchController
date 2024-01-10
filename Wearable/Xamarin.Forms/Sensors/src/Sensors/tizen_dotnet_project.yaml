@@ -1,0 +1,57 @@
+# csproj file path
+csproj_file: Sensors.csproj
+
+# files monitored for dirty/modified status
+files:
+  - App.xaml
+  - App.xaml.cs
+  - Extensions/SkiaChartView.cs
+  - Main.xaml
+  - Main.xaml.cs
+  - Model/AccelerometerModel.cs
+  - Model/BaseSensorModel.cs
+  - Model/GravityModel.cs
+  - Model/GyroscopeModel.cs
+  - Model/HRMModel.cs
+  - Model/HumidityModel.cs
+  - Model/LightModel.cs
+  - Model/LinearAccelerationModel.cs
+  - Model/MagnetometerModel.cs
+  - Model/OrientationModel.cs
+  - Model/PressureModel.cs
+  - Model/ProximityModel.cs
+  - Model/RotationVectorModel.cs
+  - Model/TemperatureModel.cs
+  - Model/UltravioletModel.cs
+  - Pages/AccelerometerPage.xaml
+  - Pages/AccelerometerPage.xaml.cs
+  - Pages/GravityPage.xaml
+  - Pages/GravityPage.xaml.cs
+  - Pages/GyroscopePage.xaml
+  - Pages/GyroscopePage.xaml.cs
+  - Pages/HRMPage.xaml
+  - Pages/HRMPage.xaml.cs
+  - Pages/HumidityPage.xaml
+  - Pages/HumidityPage.xaml.cs
+  - Pages/LightPage.xaml
+  - Pages/LightPage.xaml.cs
+  - Pages/LinearAccelerationPage.xaml
+  - Pages/LinearAccelerationPage.xaml.cs
+  - Pages/MagnetometerPage.xaml
+  - Pages/MagnetometerPage.xaml.cs
+  - Pages/OrientationPage.xaml
+  - Pages/OrientationPage.xaml.cs
+  - Pages/PressurePage.xaml
+  - Pages/PressurePage.xaml.cs
+  - Pages/ProximityPage.xaml
+  - Pages/ProximityPage.xaml.cs
+  - Pages/RotationVectorPage.xaml
+  - Pages/RotationVectorPage.xaml.cs
+  - Pages/TemperaturePage.xaml
+  - Pages/TemperaturePage.xaml.cs
+  - Pages/UltravioletPage.xaml
+  - Pages/UltravioletPage.xaml.cs
+  - Sensors.cs
+  - Sensors.csproj
+  - shared/res/Sensors.png
+  - tizen-manifest.xml
