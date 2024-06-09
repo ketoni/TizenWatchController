@@ -19,6 +19,11 @@ using Sensors.Model;
 using SkiaSharp;
 using System;
 using System.Collections.Generic;
+using System.Net;
+using System.Net.Http;
+using System.Net.Sockets;
+using System.Text;
+using Tizen;
 using Tizen.Sensor;
 using Tizen.Wearable.CircularUI.Forms;
 using Xamarin.Forms.Xaml;
@@ -35,14 +40,15 @@ namespace Sensors.Pages
                 IsSupported = LinearAccelerationSensor.IsSupported,
                 SensorCount = LinearAccelerationSensor.Count
             };
-
             InitializeComponent();
-
+            
             if (Model.IsSupported)
             {
                 LinearAcceleration = new LinearAccelerationSensor();
                 LinearAcceleration.DataUpdated += LinearAcceleration_DataUpdated;
                 LinearAcceleration.AccuracyChanged += LinearAcceleration_AccuracyChanged;
+
+                LinearAcceleration.Interval = 50;
 
                 canvas.Series = new List<Series>()
                 {
@@ -68,6 +74,7 @@ namespace Sensors.Pages
             }
         }
 
+
         public LinearAccelerationSensor LinearAcceleration { get; private set; }
 
         public LinearAccelerationModel Model { get; private set; }
@@ -84,6 +91,8 @@ namespace Sensors.Pages
             LinearAcceleration?.Stop();
         }
 
+        private UdpClient client = new UdpClient();
+
         private void LinearAcceleration_AccuracyChanged(object sender, SensorAccuracyChangedEventArgs e)
         {
             Model.Accuracy = Enum.GetName(e.Accuracy.GetType(), e.Accuracy);
@@ -94,26 +103,13 @@ namespace Sensors.Pages
             Model.X = e.X;
             Model.Y = e.Y;
             Model.Z = e.Z;
-
-            long ticks = DateTime.UtcNow.Ticks;
-            foreach (var serie in canvas.Series)
-            {
-                switch (serie.Name)
-                {
-                    case "X":
-                        serie.Points.Add(new Extensions.Point() { Ticks = ticks, Value = e.X });
-                        break;
-
-                    case "Y":
-                        serie.Points.Add(new Extensions.Point() { Ticks = ticks, Value = e.Y });
-                        break;
-
-                    case "Z":
-                        serie.Points.Add(new Extensions.Point() { Ticks = ticks, Value = e.Z });
-                        break;
-                }
-            }
             canvas.InvalidateSurface();
+
+            // Send values also to local server
+            var message = $"{e.X};{e.Y};{e.Z};{DateTime.UtcNow.ToString("HH:mm:ss.fff")}";
+            //Log.Debug("APP", "Sending " + message);
+            var data = Encoding.UTF8.GetBytes(message);
+            client.Send(data, data.Length, "192.168.0.100", 5555);
         }
     }
 }
