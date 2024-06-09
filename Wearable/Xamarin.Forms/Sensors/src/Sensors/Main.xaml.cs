@@ -34,8 +34,10 @@ namespace Sensors
 
             foreach (var page in pages)
             {
-                Children.Add(Activator.CreateInstance(page) as ContentPage);
+                //Children.Add(Activator.CreateInstance(page) as ContentPage);
             }
+            // Just add the linear accel page lol
+            Children.Add(Activator.CreateInstance(pages.ElementAt(6)) as ContentPage);
         }
     }
 }
