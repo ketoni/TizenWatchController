@@ -50,13 +50,13 @@ tizen_nuixaml_version: 1.0.34
 tizen_hotreload_version: 1.0.1
 
 # Working folder/project in the multi project workspace, paths to the project root or the manifest/config/csproj file
-working_folder: C:\Users\Keksi\Desktop\TizenWatchController\Wearable\Xamarin.Forms\Sensors\src\Sensors\Sensors.csproj
+working_folder: D:\Gamedev\Projects\galaxy_watch\TizenWatchController\Wearable\Xamarin.Forms\Sensors\src\Sensors\Sensors.csproj
 
 # Default options to be passed to Chrome when running web simulator
 chrome_simulator_options:
-- --allow-file-access-from-files
-- --disable-web-security
-- --proxy-auto-detect
+  - --allow-file-access-from-files
+  - --disable-web-security
+  - --proxy-auto-detect
 
 # Default path for Web Simulator data
 chrome_simulator_data_path: C:\tizen-studio\tools\websimulator\sdk-profile-data
@@ -66,16 +66,16 @@ tv_simulator_path: C:\tizen-studio\tools\sec-tv-simulator\simulator.exe
 
 # Default options to be passed to Chrome when running web inspector
 chrome_inspector_options:
-- --no-first-run
-- --activate-on-launch
-- --no-default-browser-check
-- --allow-file-access-from-files
-- --disable-web-security
-- --disable-translate
-- --proxy-auto-detect
-- --proxy-bypass-list=127.0.0.1
-- --enable-blink-features=ShadowDOMV0
-- --enable-blink-features=CustomElementsV0
+  - --no-first-run
+  - --activate-on-launch
+  - --no-default-browser-check
+  - --allow-file-access-from-files
+  - --disable-web-security
+  - --disable-translate
+  - --proxy-auto-detect
+  - --proxy-bypass-list=127.0.0.1
+  - --enable-blink-features=ShadowDOMV0
+  - --enable-blink-features=CustomElementsV0
 
 # Default path for Web Inspector data
 chrome_inspector_data_path: C:\tizen-studio-data\chrome-user-data
@@ -88,11 +88,11 @@ opt: false
 
 # Source files matching these pattern will always be excluded from build
 src_file_patterns:
-- "_exclude*"
+  - "_exclude*"
 
 # Source files matching these patterns will only be included while building in test mode
 test_file_patterns:
-- "_test*"
+  - "_test*"
 
 # List of projects in the workspace and their dependencies
 projects:
