@@ -14,16 +14,12 @@
  * limitations under the License.
  */
 
-using Sensors.Extensions;
 using Sensors.Model;
-using SkiaSharp;
 using System;
-using System.Collections.Generic;
 using System.Net;
-using System.Net.Http;
 using System.Net.Sockets;
 using System.Text;
-using Tizen;
+using System.Threading;
 using Tizen.Sensor;
 using Tizen.Wearable.CircularUI.Forms;
 using Xamarin.Forms.Xaml;
@@ -33,6 +29,44 @@ namespace Sensors.Pages
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class LinearAccelerationPage : CirclePage
     {
+        private readonly string[] spinnerChars = new string[] { "|", "/", "-", "\\"};
+        private int spinnerIdx = 0;
+        public string Spinner
+        {
+            get 
+            {
+                return spinnerChars[spinnerIdx++ % spinnerChars.Length];
+            }
+        }
+        private IPEndPoint clientEP = new IPEndPoint(IPAddress.Parse("192.168.0.100"), 5555);
+        private LatencyCommunicator latencyChecker = null; 
+        private UdpClient client = new UdpClient();
+
+
+
+
+
+        // Changes the frequency of which the accelometer operates at
+        private void SetSensorFrequency(uint freq)
+        {
+            Model.Frequency = freq;
+            LinearAcceleration.Interval = 1000 / freq;
+        } 
+
+        // Callback for increasing sensor frequency, used in the page xaml definition
+        public void IncreaseFrequency(object sender, EventArgs e)
+        {
+            var newFreq = Model.Frequency + 10;
+            SetSensorFrequency(newFreq > 50 ? 50 : newFreq);
+        }
+
+        // Callback for decreasing sensor frequency, used in the page xaml definition
+        public void DecreaseFrequency(object sender, EventArgs e)
+        {
+            var newFreq = Model.Frequency - 10;
+            SetSensorFrequency(newFreq < 10 ? 10 : newFreq);
+        }
+
         public LinearAccelerationPage()
         {
             Model = new LinearAccelerationModel
@@ -41,39 +75,20 @@ namespace Sensors.Pages
                 SensorCount = LinearAccelerationSensor.Count
             };
             InitializeComponent();
+
+            latencyChecker = new LatencyCommunicator(clientEP);
             
             if (Model.IsSupported)
             {
                 LinearAcceleration = new LinearAccelerationSensor();
                 LinearAcceleration.DataUpdated += LinearAcceleration_DataUpdated;
                 LinearAcceleration.AccuracyChanged += LinearAcceleration_AccuracyChanged;
+                SetSensorFrequency(10);
 
-                LinearAcceleration.Interval = 50;
-
-                canvas.Series = new List<Series>()
-                {
-                    new Series()
-                    {
-                        Color = SKColors.Red,
-                        Name = "X",
-                        FormattedText = "X={0:f2}m/s^2",
-                    },
-                    new Series()
-                    {
-                        Color = SKColors.Green,
-                        Name = "Y",
-                        FormattedText = "Y={0:f2}m/s^2",
-                    },
-                    new Series()
-                    {
-                        Color = SKColors.Blue,
-                        Name = "Z",
-                        FormattedText = "Z={0:f2}m/s^2",
-                    },
-                };
+                latencyChecker.active = true;
             }
-        }
 
+        }
 
         public LinearAccelerationSensor LinearAcceleration { get; private set; }
 
@@ -91,7 +106,6 @@ namespace Sensors.Pages
             LinearAcceleration?.Stop();
         }
 
-        private UdpClient client = new UdpClient();
 
         private void LinearAcceleration_AccuracyChanged(object sender, SensorAccuracyChangedEventArgs e)
         {
@@ -100,16 +114,77 @@ namespace Sensors.Pages
 
         private void LinearAcceleration_DataUpdated(object sender, LinearAccelerationSensorDataUpdatedEventArgs e)
         {
-            Model.X = e.X;
-            Model.Y = e.Y;
-            Model.Z = e.Z;
-            canvas.InvalidateSurface();
-
-            // Send values also to local server
-            var message = $"{e.X};{e.Y};{e.Z};{DateTime.UtcNow.ToString("HH:mm:ss.fff")}";
-            //Log.Debug("APP", "Sending " + message);
+            var message = $"D{e.X};{e.Y};{e.Z};{latencyChecker.Latency}";
             var data = Encoding.UTF8.GetBytes(message);
-            client.Send(data, data.Length, "192.168.0.100", 5555);
+            client.Send(data, data.Length, clientEP);
+            //Log.Debug("APP", "Sent" + message);
+
+            Model.LinkIndicator = Spinner;
+            Model.Latency = latencyChecker.Latency;
+        }
+    }
+
+    public class LatencyCommunicator
+    {
+        public double Latency { get; private set; }
+        public bool active;
+
+        private UdpClient client = new UdpClient(5555);
+        private IPEndPoint remoteEP = null;
+        private Thread senderThread;
+
+
+        public LatencyCommunicator(IPEndPoint endpoint)
+        {
+            // Start the thread to send messages and handle responses
+            client.Client.ReceiveTimeout = 100;
+            remoteEP = endpoint; 
+            senderThread = new Thread(SendAndReceive)
+            {
+                IsBackground = true
+            };
+            senderThread.Start();
+        }
+
+        private void SendAndReceive()
+        {
+            try
+            {
+                while (true)
+                {
+                    Thread.Sleep(250);
+                    if (!active)
+                    {
+                        continue;
+                    }
+
+                    // Send current timestamp 
+                    var message = $"L{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}";
+                    var data = Encoding.UTF8.GetBytes(message);
+                    client.Send(data, data.Length, remoteEP);
+
+                    // Wait to receive the message back to calculate latency
+                    try
+                    {
+                        var receiveBuffer = client.Receive(ref remoteEP);
+                        var timestamp = long.Parse(Encoding.UTF8.GetString(receiveBuffer));
+                        var rtt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - timestamp;
+                        Latency = rtt / 2.0;
+                    }
+                    catch (SocketException ex)
+                    {
+                        if (ex.SocketErrorCode != SocketError.TimedOut)
+                        {
+                            throw;
+                        }
+                        continue;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in LatencyCommunicator thread: {ex.Message}");
+            }
         }
     }
 }

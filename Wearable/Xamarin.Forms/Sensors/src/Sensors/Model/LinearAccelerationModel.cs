@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+using System;
+
 namespace Sensors.Model
 {
     /// <summary>
@@ -22,16 +24,10 @@ namespace Sensors.Model
     public class LinearAccelerationModel : BaseSensorModel
     {
         private string accuracy;
+        private uint frequency;
+        private string linkIndicator;
+        private double latency;
 
-        private float x;
-
-        private float y;
-
-        private float z;
-
-        /// <summary>
-        /// Property for accuracy.
-        /// </summary>
         public string Accuracy
         {
             get { return accuracy; }
@@ -42,43 +38,36 @@ namespace Sensors.Model
             }
         }
 
-        /// <summary>
-        /// Property for actual X value.
-        /// </summary>
-        public float X
+        public uint Frequency 
         {
-            get { return x; }
-            set
+            get { return frequency; }
+            set 
             {
-                x = value;
+                frequency = value;
                 OnPropertyChanged();
             }
         }
 
-        /// <summary>
-        /// Property for actual Y value.
-        /// </summary>
-        public float Y
+        public string LinkIndicator
         {
-            get { return y; }
-            set
+            get { return linkIndicator; }
+            set 
             {
-                y = value;
+                linkIndicator = value;
                 OnPropertyChanged();
             }
         }
 
-        /// <summary>
-        /// Property for actual Z value.
-        /// </summary>
-        public float Z
+        public double Latency
         {
-            get { return z; }
-            set
+            get { return latency; }
+            set 
             {
-                z = value;
+                latency = value;
                 OnPropertyChanged();
             }
         }
+
+
     }
 }

@@ -10,12 +10,14 @@
 	<cui:CircleScrollView x:Name="pageScroller" Orientation="Vertical" VerticalOptions="Center" HorizontalOptions="CenterAndExpand" HeightRequest="300">
 		<StackLayout>
 			<Label Text="Linear Acceleration" HorizontalOptions="Center"/>
-			<Label Text="{Binding IsSupported, StringFormat='Is supported: {0}'}" Style="{StaticResource LabelDataStyle}"/>
-			<Label Text="{Binding SensorCount, StringFormat='Sensor count: {0}'}" Style="{StaticResource LabelDataStyle}"/>
-			<Label Text="{Binding Accuracy, StringFormat='Accuracy: {0}'}" Style="{StaticResource LabelDataStyle}"/>
-			<Label Text="{Binding X, StringFormat='X: {0:N2}'}}" Style="{StaticResource LabelDataStyle}"/>
-			<Label Text="{Binding Y, StringFormat='Y: {0:N2}'}}" Style="{StaticResource LabelDataStyle}"/>
-			<Label Text="{Binding Z, StringFormat='Z: {0:N2}'}}" Style="{StaticResource LabelDataStyle}"/>
+			<Label Text="{Binding IsSupported, StringFormat='Supported: {0}'}" Style="{StaticResource LabelDataStyle}"/>
+			<Label Text="{Binding Latency, StringFormat='Latency: {0:F1} ms'}" Style="{StaticResource LabelDataStyle}"/>
+			<Label Text="{Binding LinkIndicator, StringFormat='Link: {0}'}}" Style="{StaticResource LabelDataStyle}"/>
+			<Label Text="{Binding Frequency, StringFormat='Rate: {0} Hz'}" Style="{StaticResource LabelDataStyle}"/>
+            <StackLayout Orientation="Horizontal" HorizontalOptions="Center">
+				<Button Text="+" Clicked="IncreaseFrequency" />
+                <Button Text="-" Clicked="DecreaseFrequency" />
+            </StackLayout>
 			<local:SkiaChartView x:Name="canvas" HeightRequest="200" WidthRequest="360"/>
 		</StackLayout>
 	</cui:CircleScrollView>
