@@ -38,7 +38,7 @@ namespace Sensors.Pages
                 return spinnerChars[spinnerIdx++ % spinnerChars.Length];
             }
         }
-        private IPEndPoint clientEP = new IPEndPoint(IPAddress.Parse("192.168.0.100"), 5555);
+        private IPEndPoint clientEP = new IPEndPoint(IPAddress.Parse("192.168.0.159"), 5555);
         private LatencyCommunicator latencyChecker = null; 
         private UdpClient client = new UdpClient();
 
